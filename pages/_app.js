@@ -1,23 +1,24 @@
 import React from 'react';
-import AppHeader from 'components/Header/AppHeader';
-import AppFooter from 'components/Footer/AppFooter';
-import { Content, Theme } from '@carbon/react';
 import '../styles/globals.scss';
+import AppHeader from 'components/AppHeader';
+import AppFooter from 'components/AppFooter';
+import { ThemePreference } from 'components/ThemePreference';
+import { AuthProvider } from 'components/Auth';
+import { Content } from '@carbon/react';
+
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <Theme theme="g100">
+      <ThemePreference>
         <AppHeader />
-      </Theme>
-      
-      <Content>
-        <Component {...pageProps} />
-      </Content>
-
-      <Theme theme="g100">
+        <AuthProvider>
+          <Content>
+            <Component {...pageProps} />
+          </Content>
+        </AuthProvider>
         <AppFooter />
-      </Theme>
+      </ThemePreference>
     </>
   );
 }

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from "next/link";
-import styles from './AppHeader.module.scss';
 import {
   Header,
   HeaderContainer,
@@ -12,18 +11,31 @@ import {
   HeaderGlobalAction,
   SideNav,
   SideNavItems,
-  HeaderSideNavItems
+  HeaderSideNavItems,
+  Toggle
 } from '@carbon/react';
 
-
 import { 
-  Search,
   Switcher,
   Notification
- } from '@carbon/react/icons';
+} from '@carbon/react/icons';
 
+import { useThemePreference } from './ThemePreference'
 
 const AppHeader = () => {
+
+  const { theme, setTheme } = useThemePreference();
+  const [themeToggle, setThemeToggle] = useState(true);
+
+  const switchTheme = () => {
+    if (theme === 'g100') {
+      setTheme('g10');
+    }
+    if (theme === 'g10') {
+      setTheme('g100');
+    }
+    setThemeToggle(!themeToggle);
+  }
 
   return (
     <HeaderContainer
@@ -43,10 +55,13 @@ const AppHeader = () => {
             </HeaderMenuItem>
           </HeaderNavigation>
           <HeaderGlobalBar>
-            <HeaderGlobalAction
-              aria-label="Search">
-              <Search size={20} />  
-            </HeaderGlobalAction>
+            <Toggle 
+              toggled={themeToggle}
+              onToggle={switchTheme}
+              labelA="Light"
+              labelB="Dark"
+              id="themeToggle"
+            />
             <HeaderGlobalAction
               aria-label="Notifications">
               <Notification size={20} />  

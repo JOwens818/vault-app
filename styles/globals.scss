@@ -1,22 +1,21 @@
-@use '@carbon/react/scss/themes';
-@use '@carbon/react/scss/theme' with ($theme: themes.$g10);
 @use '@carbon/react';
 @use '@carbon/react/scss/breakpoint' as *;
-
-
 @use '@carbon/styles';
 @use '@carbon/styles/scss/grid';
 @include grid.flex-grid();
 
 #__next {
-  @include theme.theme();
+  @include react.theme(react.$g100);
+}
+
+[data-carbon-theme='g10'] {
+  @include react.theme(react.$g10);
 }
 
 .cds--grid {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
-
 
 a {
   text-decoration: none;
@@ -42,7 +41,8 @@ a {
 .cds--content {
   margin-top: 3rem;
   padding: 0;
-  background: var(--cds-background);
+  background: react.$background;
+  color: react.$text-primary;
   min-height: calc(100vh - 6rem);
 }
 
@@ -52,4 +52,23 @@ a {
     padding-left: 20px;
     padding-right: 20px;
   }
+}
+
+
+.footerContainer {
+  height: 3rem;
+  margin-top: 0 !important;
+  padding-top: 1rem;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  border-top: 1px solid react.$border-subtle-01;
+}
+
+.windowHeight {
+  min-height: calc(100vh - 6rem);
+}
+
+.inlineNotification {
+  max-width: 100%;
+  margin-top: 1rem;
 }
