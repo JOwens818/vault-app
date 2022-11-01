@@ -16,7 +16,7 @@ import {
   const { theme } = useThemePreference();
   const { username, authLoading } = userAuth();
 
-  if (authLoading || username !== "admin") return <Loading />;
+  if (authLoading || !username || username !== "admin") return <Loading />;
 
   return (
     <Theme theme={theme} className="windowHeight">

@@ -1,14 +1,18 @@
-import { signNewJwt } from "lib/auth/jwt";
+import { sendCookie } from "lib/auth/jwt";
 import { findUser } from "lib/db/pgQuery";
 import { comparePassword } from "lib/crypto/hash";
-import cookie from 'cookie';
 
 
 const handler = async (req, res) => {
   
-  let isDefaultAdmin = false;
   const username = req.body.username;
   const pw = req.body.password;
+
+  // Look for admin creds
+  if (username === "admin" && pw === process.env.ADMINPW) {
+    return sendCookie(res, username);
+  }
+
   const userResp = await findUser(username);
 
   // Error occurred getting user from DB
@@ -18,41 +22,18 @@ const handler = async (req, res) => {
 
   // User was not found in DB
   if (userResp.status === "fail") {
-    if (username !== "admin" || (username === "admin" && pw !== "admin")) {
-      return res.status(401).json(userResp);
-    }
-    isDefaultAdmin = true;
+    return res.status(200).json(userResp);
   }
 
   // User found in DB: validate password
-  if (!isDefaultAdmin) {
-    const doesPasswordMatch = comparePassword(pw, userResp.data[0].password);
-    if (!doesPasswordMatch) {
-      console.log("Failed login attempt by user: " + username);
-      return res.status(401).json({ status: "fail", message: "User is unauthorized" }); 
-    }
+  const doesPasswordMatch = await comparePassword(pw, userResp.data[0].password);
+  if (!doesPasswordMatch) {
+    console.log("Failed login attempt by user: " + username);
+    return res.status(401).json({ status: "fail", message: "Invalid password" }); 
   }
-  
-  try {
-    let signedJwt = signNewJwt(username);
-    const expiry = new Date(new Date().getTime() + 5 * 60 * 1000);
-    res.setHeader(
-      "Set-Cookie",
-      cookie.serialize("vault_token", signedJwt, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-        expires: expiry
-      })
-    );
-    console.log("Successful login by user: " + username);
-    res.status(200).json({ status: "success", message: "JWT created" });
-  } catch (jwtErr) {
-    console.error("Error encountered during JWT creation");
-    console.error(jwtErr);
-    res.status(500).json({ status: "error", message: "Error encountered during JWT creation" })
-  }
+
+  sendCookie(res, username);
+
 }
 
 export default handler;

@@ -37,10 +37,10 @@ const userProvideAuth = () => {
           }
         } else {
           setUsername(validationResp.data.username);
-          if (validationResp.data.username !== "admin" && router.path === "/admin") {
+          if (validationResp.data.username !== "admin" && router.pathname === "/admin") {
             router.push("/");
           }
-          if (validationResp.data.username === "admin" && router.path !== "/admin") {
+          if (validationResp.data.username === "admin" && router.pathname !== "/admin") {
             router.push("/admin");
           }
         }
