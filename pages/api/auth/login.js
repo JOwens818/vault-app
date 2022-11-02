@@ -1,5 +1,5 @@
 import { sendCookie } from "lib/auth/jwt";
-import { findUser } from "lib/db/pgQuery";
+import { doesUserExist } from "lib/db/users";
 import { comparePassword } from "lib/crypto/hash";
 
 
@@ -13,15 +13,8 @@ const handler = async (req, res) => {
     return sendCookie(res, username);
   }
 
-  const userResp = await findUser(username);
-
-  // Error occurred getting user from DB
-  if (userResp.status === "error") {
-    return res.status(500).json({ status: "error", message: "Error retrieving user information" });
-  }
-
-  // User was not found in DB
-  if (userResp.status === "fail") {
+  const userResp = await doesUserExist(username);
+  if (userResp.status !== success) {
     return res.status(200).json(userResp);
   }
 

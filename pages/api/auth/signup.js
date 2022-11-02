@@ -1,5 +1,5 @@
 import { sendCookie } from "lib/auth/jwt";
-import { findUser, createUser } from "lib/db/pgQuery";
+import { doesUserExist, createUser } from "lib/db/users";
 import { createPasswordHash } from "lib/crypto/hash";
 
 
@@ -15,11 +15,11 @@ const handler = async (req, res) => {
     return res.status(400).json({ status: "fail", message: "Invalid email address format" });
   }
 
-  const userResp = await findUser(username);
+  const userResp = await doesUserExist(username);
 
   // Error occurred getting user from DB
   if (userResp.status === "error") {
-    return res.status(500).json({ status: "error", message: "Error retrieving user information" });
+    return res.status(500).json(userResp);
   }
 
   // User already exists in DB

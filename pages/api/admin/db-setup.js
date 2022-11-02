@@ -10,6 +10,8 @@ const handler = async (req, res) => {
     } else {
       res.status(401).json({ status: "fail", message: "You are unauthorized to make this request" });
     } 
+  } else {
+    res.status(400).json({ status: "fail", message: "Expected POST request" });
   }
 };
 
