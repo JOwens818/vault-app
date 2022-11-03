@@ -17,9 +17,9 @@ import {
   Loading,
   InlineLoading,
   InlineNotification
- } from '@carbon/react';
+} from '@carbon/react';
 
- const LoginPage = () => {
+const LoginPage = () => {
 
   const router = useRouter();
   const { theme } = useThemePreference();

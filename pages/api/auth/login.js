@@ -14,7 +14,7 @@ const handler = async (req, res) => {
   }
 
   const userResp = await doesUserExist(username);
-  if (userResp.status !== success) {
+  if (userResp.status !== "success") {
     return res.status(200).json(userResp);
   }
 
