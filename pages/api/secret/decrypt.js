@@ -14,7 +14,7 @@ const handler = async (req, res) => {
     return res.status(200).json(userResp);
   }
 
-  const userid = userResp.data[0].userid;
+  const userid = userResp.data[0].id;
   const secretResp = await doesUserSecretExist(userid, hashedLabel);
   if (secretResp.status !== "success") {
     return res.status(200).json(secretResp);

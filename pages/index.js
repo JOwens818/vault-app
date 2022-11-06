@@ -44,7 +44,7 @@ const LandingPage = () => {
                         let { index } = obj;
                         setContentIndex(index);
                       }}>
-                      <Switch name="list" text="Secrets" />
+                      <Switch name="list" text="Secrets Manager" />
                       <Switch name="create" text="Create Secret" />
                     </ContentSwitcher>
                     {

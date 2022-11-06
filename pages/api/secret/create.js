@@ -21,7 +21,7 @@ const handler = async (req, res) => {
     }
 
     // Check if secret already exists
-    const userid = userResp.data[0].userid;
+    const userid = userResp.data[0].id;
     const findSecret = await doesUserSecretExist(userid, hashedLabel);
     if (findSecret.status === "error") {
       return res.status(500).json(findSecret);

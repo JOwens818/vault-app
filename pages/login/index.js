@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useThemePreference } from 'components/ThemePreference';
 import { userAuth } from 'components/Auth'; 
 import { fetcher } from "lib/apiFetcher";
+import InlineNoti from 'components/InlineNoti';
 import { 
   Tile,
   FlexGrid,
@@ -15,9 +16,9 @@ import {
   Checkbox,
   Button,
   Loading,
-  InlineLoading,
-  InlineNotification
+  InlineLoading
 } from '@carbon/react';
+
 
 const LoginPage = () => {
 
@@ -26,12 +27,10 @@ const LoginPage = () => {
   const { authLoading } = userAuth();
   const [newUser, setNewUser] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [badLogin, setBadLogin] = useState(false);
-  const [notificationType, setNotificationType] = useState("info");
-  const [notificationText, setNotificationText] = useState("");
   const [invalidUsername, setInvalidUsername] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
+  const [loginResponse, setLoginResponse] = useState(null);
 
 
   const invalidUserInputLength = (field, size) => {
@@ -40,7 +39,7 @@ const LoginPage = () => {
 
 
   const validateUserInputs = (payload) => {
-    const areAllInputsValid = true;
+    let areAllInputsValid = true;
 
     if (invalidUserInputLength(payload.username, 6)) {
       setInvalidUsername(true);
@@ -52,7 +51,7 @@ const LoginPage = () => {
       areAllInputsValid = false;
     }
 
-    if (newUser && invalidUserInputLength(payload.email, 6)) {
+    if (invalidUserInputLength(payload.email, 6)) {
       setInvalidEmail(true);
       areAllInputsValid = false;
     }
@@ -61,13 +60,20 @@ const LoginPage = () => {
   }
 
 
-  const login = async (e) => {
+  const loginOnEnterKey = async (e) => {
+    const code = e.keyCode || e.which;
+    if (code ===13) {
+      login();
+    }
+  }
+
+
+  const login = async () => {
 
     setInvalidUsername(false);
     setInvalidPassword(false);
     setInvalidEmail(false);
     setLoginLoading(true);
-    setBadLogin(false);
 
     const payload = {
       username: username.value,
@@ -78,7 +84,7 @@ const LoginPage = () => {
       payload.email = email.value 
     }
 
-    if (username.value !== "admin" && !validateUserInputs(payload)) { 
+    if (username.value !== "admin" && newUser && !validateUserInputs(payload)) { 
       setLoginLoading(false);
       return; 
     }
@@ -94,17 +100,11 @@ const LoginPage = () => {
     };
 
     const loginResp = await fetcher("login", apiRoute, "POST", headers, JSON.stringify(payload));
+    setLoginResponse(loginResp);
     if (loginResp.status !== "success") {
-      setNotificationText(loginResp.message);
-      if (loginResp.status === "fail") {
-        if (loginResp.message === "Invalid email address format") {
-          setInvalidEmail(true);
-        }
-        setNotificationType("info");
-      } else {
-        setNotificationType("error");
-      }
-      setBadLogin(true);
+      if (loginResp.status === "fail" && loginResp.message === "Invalid email address format") {
+        setInvalidEmail(true);
+      } 
       setLoginLoading(false);
     } else {
       const redirect = payload.username === "admin" ? "/admin" : "/";
@@ -142,6 +142,7 @@ const LoginPage = () => {
                     placeholder="user123"
                     invalid={invalidUsername}
                     invalidText="Username must be at least 6 characters"
+                    onKeyPress={loginOnEnterKey}
                   />
                   { newUser && 
                     <TextInput 
@@ -152,6 +153,7 @@ const LoginPage = () => {
                       placeholder="user123@gmail.com"
                       invalid={invalidEmail}
                       invalidText="Enter a valid email address"
+                      onKeyPress={loginOnEnterKey}
                     />
                   }
                   
@@ -163,6 +165,7 @@ const LoginPage = () => {
                     placeholder="p@ssw0rd"
                     invalid={invalidPassword}
                     invalidText="Password must be at least 10 characters"
+                    onKeyPress={loginOnEnterKey}
                   />
                   {
                     !loginLoading ? (
@@ -183,12 +186,7 @@ const LoginPage = () => {
                 </Stack>
               </FormGroup>
               {
-                badLogin &&
-                <InlineNotification
-                className="inlineNotification"
-                  kind={notificationType}
-                  subtitle={notificationText}
-                />
+                loginResponse && <InlineNoti data={loginResponse}/>
               }
             </Tile>
           </Column>
