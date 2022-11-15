@@ -1,6 +1,7 @@
 @use '@carbon/react';
 @use '@carbon/react/scss/breakpoint' as *;
 @use '@carbon/styles';
+@use '@carbon/type';
 @use '@carbon/styles/scss/grid';
 @include grid.flex-grid();
 
@@ -79,4 +80,46 @@ a {
 
 .regularLink a {
   text-decoration: underline;
+}
+
+.dataTableSkeleton {
+  width: 100%;
+}
+
+.cds--modal-container {
+  max-height: 50% !important;
+}
+
+.secretHeading {
+  @include type.type-style("fluid-heading-03", true);
+  margin-bottom: 1rem;
+}
+
+.inlineNotiContainer {
+  max-width: 100%;
+  margin-top: 1rem;
+  color: react.$text-inverse;
+  background-color: react.$background-inverse-hover;
+  padding: 10px;
+  display: flow-root;
+}
+
+.notiText {
+  word-wrap: break-word;
+  margin-left: 2rem;
+}
+
+.infoIcon {
+  color: react.$support-info-inverse;
+  float: left;
+}
+
+.errorIcon {
+  color: react.$support-error-inverse;
+  float: left;
+}
+
+.checkmarkIcon {
+  color: react.$support-success-inverse;
+  float: left;
 }

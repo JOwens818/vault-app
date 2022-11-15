@@ -8,9 +8,11 @@ const handler = async (req, res) => {
   if (req.method === "POST") {
 
     let encryptedSecret;
-    let encryptedLabel
+    let encryptedLabel;
+    let encryptedNotes;
     const secret = req.body.secret;
     const label = req.body.secretLabel;
+    const notes = req.body.notes;
     const hashedLabel = generateHash(label);
     const iv = generateIv();
 
@@ -35,12 +37,13 @@ const handler = async (req, res) => {
     try {
       encryptedSecret = encryptPlainText(secret, iv);
       encryptedLabel = encryptPlainText(label, iv);
+      encryptedNotes = encryptPlainText(notes, iv);
     } catch (encryptErr) {
       console.error("Error encrypting values: " + encryptErr);
       return res.status(500).json({ status: "error", message: "Error creating secret" });
     }
 
-    const createSecret = await createUserSecret(userid, hashedLabel, encryptedLabel, encryptedSecret, iv);
+    const createSecret = await createUserSecret(userid, hashedLabel, encryptedLabel, encryptedSecret, encryptedNotes, iv);
     if (createSecret.status === "error") {
       return res.status(500).json({ status: "error", message: "Error creating secret" });
     }

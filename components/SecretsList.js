@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { fetcher } from 'lib/apiFetcher';
 import { useRouter } from "next/router";
 import SessionExpired from './SessionExpired';
+import ViewSecretModal from './modals/ViewSecret';
+import InlineNoti from './InlineNoti';
 import { 
   Button,
   DataTable,
@@ -17,11 +19,9 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
-  DataTableSkeleton,
-  TableToolbarAction,
-  TableToolbarMenu
+  SkeletonText
 } from '@carbon/react';
-import { Download } from '@carbon/react/icons';
+import { TrashCan, UpdateNow, View } from '@carbon/react/icons';
 	
 
 const SecretsList = (props) => {
@@ -29,8 +29,12 @@ const SecretsList = (props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [secretList, setSecretList] = useState([]);
+  const [secretListResponse, setSecretListResponse] = useState(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [secretLabel, setSecretLabel] = useState("");
+  const [noSelection, setNoSelection] = useState(false);
+
 
   useEffect(() => {
     const initialize = async () => {
@@ -43,7 +47,6 @@ const SecretsList = (props) => {
   const getSecretList = async () => {
     setLoading(true);
     setError(false);
-    setSecretList([]);
 
     const secretListResp = await fetcher("getSecretList", "/api/secrets/list", "GET");
     if (secretListResp.status === "fail") {
@@ -52,13 +55,23 @@ const SecretsList = (props) => {
     
     if (secretListResp.status === "error") {
       setError(true);
-    } else {
-      setSecretList(secretListResp.data);
     }
+    setSecretListResponse(secretListResp);
     setLoading(false);
   }
 
   
+  const getSecret = async (selectedRow) => {
+    if (selectedRow.length > 0) {
+      setNoSelection(false);
+      setSecretLabel(getLabel(selectedRow));
+      setIsViewModalOpen(true);
+    } else {
+      setNoSelection(true);
+    }
+  }
+
+
   const getLabel = (selectedRow) => {
     
     if (selectedRow.length === 0) {
@@ -66,32 +79,60 @@ const SecretsList = (props) => {
     }
 
     let label;
-    secretList.forEach(s => {
+    secretListResponse.data.forEach(s => {
       if (s.id === selectedRow[0].id) {
         label = s.Secret;
       }
     });
     return label;
   }
+
+
+  const handleModalClose = () => {
+    setIsViewModalOpen(false);
+  }
   
+
   return (
     <>
+
+      {
+        isViewModalOpen && (
+          <ViewSecretModal 
+          isViewModalOpen={isViewModalOpen}
+          handleModalClose={handleModalClose}
+          secretLabel={secretLabel}
+          />
+        )
+      }
+
+
       { loading ? (
-          <DataTableSkeleton />
+          <SkeletonText paragraph={true} /> 
         ) : (
           <>
             { sessionExpired && ( <SessionExpired /> ) }
 
-            { error && ( <Tile><h4>Error Retrieving Secrets...</h4></Tile> ) }
-          
-            { !error && secretList && secretList.length === 0 && ( <Tile><h4>No secrets found</h4></Tile> ) }
+            { noSelection && <InlineNoti data={{ status: "fail", message: "Please select a secret" }}/> }
 
-            { !error && secretList && secretList.length > 0 && (
+            { error && ( 
+              <Tile>
+                <InlineNoti data={secretListResponse}/>
+              </Tile> 
+            )}
+          
+            { !error && secretListResponse.data && secretListResponse.data.length === 0 && ( 
+              <Tile>
+                <InlineNoti data = {{ status: "fail", message: "No secrets found" }}/>
+              </Tile> 
+            )}
+
+            { !error && secretListResponse.data && secretListResponse.data.length > 0 && (
               <div className='topMargin'>
                 <DataTable
                   radio
                   useZebraStyles={true}
-                  rows={secretList}
+                  rows={secretListResponse.data}
                   overflowMenuOnHover={true}
                   headers={[{ key: "Secret", header: "My Secrets" }]} 
                   isSortable>
@@ -119,21 +160,24 @@ const SecretsList = (props) => {
                             tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                             onChange={onInputChange} />
                         </TableToolbarContent>
-                        <TableToolbarMenu>
-                          <TableToolbarAction onClick={() => console.log(getLabel(selectedRows))}>
-                            Update
-                          </TableToolbarAction>
-                          <TableToolbarAction onClick={() => console.log(getLabel(selectedRows))}>
-                            Delete
-                          </TableToolbarAction>
-                        </TableToolbarMenu>
                           <Button
-                            tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                             onClick={() => console.log(getLabel(selectedRows))}
-                            size="small"
-                            kind="primary">
-                            View Secret
-                          </Button>
+                            kind="danger--ghost"
+                            hasIconOnly
+                            iconDescription="Delete"
+                            renderIcon={TrashCan} />
+                          <Button
+                            onClick={() => console.log(getLabel(selectedRows))}
+                            kind="ghost"
+                            hasIconOnly
+                            iconDescription="Update"
+                            renderIcon={UpdateNow} />
+                          <Button
+                            onClick={() => getSecret(selectedRows)}
+                            kind="ghost"
+                            hasIconOnly
+                            iconDescription="View"
+                            renderIcon={View} />
                       </TableToolbar>
                       <Table {...getTableProps()}>
                         <TableHead>

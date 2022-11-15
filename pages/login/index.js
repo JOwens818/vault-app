@@ -31,6 +31,7 @@ const LoginPage = () => {
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [loginResponse, setLoginResponse] = useState(null);
+  const [shotNoti, setShowNoti] = useState(false);
 
 
   const invalidUserInputLength = (field, size) => {
@@ -70,6 +71,7 @@ const LoginPage = () => {
 
   const login = async () => {
 
+    setShowNoti(false);
     setInvalidUsername(false);
     setInvalidPassword(false);
     setInvalidEmail(false);
@@ -102,6 +104,7 @@ const LoginPage = () => {
     const loginResp = await fetcher("login", apiRoute, "POST", headers, JSON.stringify(payload));
     setLoginResponse(loginResp);
     if (loginResp.status !== "success") {
+      setShowNoti(true);
       if (loginResp.status === "fail" && loginResp.message === "Invalid email address format") {
         setInvalidEmail(true);
       } 
@@ -185,9 +188,7 @@ const LoginPage = () => {
                   
                 </Stack>
               </FormGroup>
-              {
-                loginResponse && <InlineNoti data={loginResponse}/>
-              }
+              { shotNoti && loginResponse && <InlineNoti data={loginResponse}/> }
             </Tile>
           </Column>
         </Row>

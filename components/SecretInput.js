@@ -6,8 +6,9 @@ import {
   FormGroup,
   Stack,
   TextInput,
+  TextArea,
   Button,
-  InlineLoading,
+  InlineLoading
 } from '@carbon/react';
 
 const SecretInput = (props) => {
@@ -16,6 +17,7 @@ const SecretInput = (props) => {
   const [createResponse, setCreateResponse] = useState(null);
   const [invalidSecretLabel, setInvalidSecretLabel] = useState(false);
   const [invalidSecret, setInvalidSecret] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState("active");
 
 
   const loginOnEnterKey = async (e) => {
@@ -40,6 +42,12 @@ const SecretInput = (props) => {
     return areAllInputsValid;
   }
 
+
+  const createSuccess = () => {
+    setCreateLoading(false);
+  }
+
+
   const createSecret = async (e) => {
 
     setInvalidSecretLabel(false);
@@ -48,7 +56,8 @@ const SecretInput = (props) => {
     
     const payload = {
       secretLabel: label.value,
-      secret: secret.value
+      secret: secret.value,
+      notes: notes.value.length > 0 ? notes.value : "null"
     };
 
     if (!validateSecretInputs(payload)) {
@@ -56,13 +65,10 @@ const SecretInput = (props) => {
       return;
     }
 
-    const headers = {
-      "Content-type": "application/json"
-    };
-
+    const headers = { "Content-type": "application/json" };
     const createSecretResp = await fetcher("createSecret", "/api/secret/create", "POST", headers, JSON.stringify(payload));
+    setLoadingStatus(createSecretResp.status === "success" ? "finished" : "error"); 
     setCreateResponse(createSecretResp);
-    setCreateLoading(false);
   }
 
 
@@ -90,6 +96,14 @@ const SecretInput = (props) => {
             invalidText="Value cannot be null"
             onKeyPress={loginOnEnterKey}
           />
+          <TextArea 
+            id="notes"
+            name="notes"
+            placeholder="Login at myBank.com"
+            labelText="Additional Notes (Optional)"
+            maxCount={100}
+            enableCounter={true}
+          />
           {
             !createLoading ? (
               <Button 
@@ -101,15 +115,15 @@ const SecretInput = (props) => {
             ) : (
               <InlineLoading 
                 description="Encrypting secret..."
-                status="active"
+                status={loadingStatus}
+                onSuccess={createSuccess}
+                successDelay={2000}
               />
             )
           }
         </Stack>
       </FormGroup>
-      {
-        createResponse && <InlineNoti data={createResponse}/>
-      }
+      { createResponse && <InlineNoti data={createResponse} /> }
     </Tile>
   );
 
