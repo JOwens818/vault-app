@@ -1,6 +1,5 @@
 import { sendCookie } from "lib/auth/jwt";
-import { doesUserExist } from "lib/db/users";
-import { comparePassword } from "lib/crypto/hash";
+import { validateUserLogin } from "lib/db/users";
 
 
 const handler = async (req, res) => {
@@ -12,19 +11,13 @@ const handler = async (req, res) => {
   if (username === "admin" && pw === process.env.ADMINPW) {
     return sendCookie(res, username);
   }
-
-  const userResp = await doesUserExist(username);
-  if (userResp.status !== "success") {
-    return res.status(200).json(userResp);
+  
+  const userLoginResp = await validateUserLogin(username, pw);
+  if (userLoginResp.status !== "success") {
+    const status = userLoginResp.status === "error"? 500 : 401;
+    return res.status(status).json(userLoginResp);
   }
-
-  // User found in DB: validate password
-  const doesPasswordMatch = await comparePassword(pw, userResp.data[0].password);
-  if (!doesPasswordMatch) {
-    console.log("Failed login attempt by user: " + username);
-    return res.status(401).json({ status: "fail", message: "Invalid password" }); 
-  }
-
+    
   sendCookie(res, username);
 
 }

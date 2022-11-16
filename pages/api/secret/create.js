@@ -1,15 +1,12 @@
 import validateToken from "lib/auth/validateToken";
-import { encryptPlainText, generateHash, generateIv } from "lib/crypto/encrypt-decrypt";
-import { doesUserSecretExist, createUserSecret } from "lib/db/secrets";
+import { generateHash, generateIv } from "lib/crypto/encrypt-decrypt";
+import { doesUserSecretExist, createUserSecret, encryptSecretValues } from "lib/db/secrets";
 import { doesUserExist } from "lib/db/users";
 
 const handler = async (req, res) => {
 
   if (req.method === "POST") {
 
-    let encryptedSecret;
-    let encryptedLabel;
-    let encryptedNotes;
     const secret = req.body.secret;
     const label = req.body.secretLabel;
     const notes = req.body.notes;
@@ -30,20 +27,19 @@ const handler = async (req, res) => {
     }
 
     if (findSecret.status === "success") {
-      return res.status(400).json({ status: "fail", message: "Secret already exists" });
+      return res.status(400).json({ status: "error", message: "Secret already exists" });
     }
 
     // Encrypt and save
-    try {
-      encryptedSecret = encryptPlainText(secret, iv);
-      encryptedLabel = encryptPlainText(label, iv);
-      encryptedNotes = encryptPlainText(notes, iv);
-    } catch (encryptErr) {
-      console.error("Error encrypting values: " + encryptErr);
-      return res.status(500).json({ status: "error", message: "Error creating secret" });
-    }
+    const encryptedValues = encryptSecretValues(secret, label, notes, iv);
+    const createSecret = await createUserSecret(
+      userid, 
+      hashedLabel, 
+      encryptedValues.encryptedLabel, 
+      encryptedValues.encryptedSecret, 
+      encryptedValues.encryptedNotes, 
+      iv);
 
-    const createSecret = await createUserSecret(userid, hashedLabel, encryptedLabel, encryptedSecret, encryptedNotes, iv);
     if (createSecret.status === "error") {
       return res.status(500).json({ status: "error", message: "Error creating secret" });
     }

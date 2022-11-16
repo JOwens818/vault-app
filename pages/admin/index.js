@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useThemePreference } from 'components/ThemePreference';
 import { userAuth } from 'components/Auth'; 
-import { fetcher } from "lib/apiFetcher";
 import { 
   Tile,
   FlexGrid,

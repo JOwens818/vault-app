@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, createContext, useState } from "react";
 import { useRouter } from "next/router";
-import { fetcher } from "lib/apiFetcher";
+import { fetcher } from "lib/utils/apiFetcher";
 
 
 const authContext = createContext();

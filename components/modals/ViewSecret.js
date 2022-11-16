@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactPortal from "./ReactPortal";
-import { fetcher } from "lib/apiFetcher";
+import { fetcher } from "lib/utils/apiFetcher";
 import InlineNoti from "components/InlineNoti";
 import { 
   ComposedModal,
@@ -57,7 +57,7 @@ const ViewSecretModal = (props) => {
           { loading && (
             <>
               <TextInputSkeleton /> 
-              <TextAreaSkeleton />
+              <TextAreaSkeleton className="topMargin"/>
             </>
           )}
               
@@ -74,6 +74,7 @@ const ViewSecretModal = (props) => {
                 value={decrypted.data.secret}
               />
               <TextArea 
+                className="topMargin"
                 id="viewNotes"
                 name="viewNotes"
                 labelText="Additional Notes"

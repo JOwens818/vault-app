@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetcher } from 'lib/apiFetcher';
+import { fetcher } from 'lib/utils/apiFetcher';
 import { useRouter } from "next/router";
 import SessionExpired from './SessionExpired';
 import ViewSecretModal from './modals/ViewSecret';

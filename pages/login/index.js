@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useRouter } from "next/router";
 import { useThemePreference } from 'components/ThemePreference';
 import { userAuth } from 'components/Auth'; 
-import { fetcher } from "lib/apiFetcher";
+import { fetcher } from "lib/utils/apiFetcher";
 import InlineNoti from 'components/InlineNoti';
+import { validateNewUserInputs } from 'lib/utils/validation';
 import { 
   Tile,
   FlexGrid,
@@ -34,33 +35,6 @@ const LoginPage = () => {
   const [shotNoti, setShowNoti] = useState(false);
 
 
-  const invalidUserInputLength = (field, size) => {
-    return field.length < size;
-  }
-
-
-  const validateUserInputs = (payload) => {
-    let areAllInputsValid = true;
-
-    if (invalidUserInputLength(payload.username, 6)) {
-      setInvalidUsername(true);
-      areAllInputsValid = false;
-    }
-
-    if (invalidUserInputLength(payload.password, 10)) {
-      setInvalidPassword(true);
-      areAllInputsValid = false;
-    }
-
-    if (invalidUserInputLength(payload.email, 6)) {
-      setInvalidEmail(true);
-      areAllInputsValid = false;
-    }
-
-    return areAllInputsValid;
-  }
-
-
   const loginOnEnterKey = async (e) => {
     const code = e.keyCode || e.which;
     if (code ===13) {
@@ -70,7 +44,6 @@ const LoginPage = () => {
 
 
   const login = async () => {
-
     setShowNoti(false);
     setInvalidUsername(false);
     setInvalidPassword(false);
@@ -86,7 +59,11 @@ const LoginPage = () => {
       payload.email = email.value 
     }
 
-    if (username.value !== "admin" && newUser && !validateUserInputs(payload)) { 
+    const inputValidation = validateNewUserInputs(payload);
+    if (username.value !== "admin" && newUser && !inputValidation.areAllInputsValid) { 
+      setInvalidUsername(inputValidation.invalidUsername);
+      setInvalidPassword(inputValidation.invalidPassword);
+      setInvalidEmail(inputValidation.invalidEmail);
       setLoginLoading(false);
       return; 
     }

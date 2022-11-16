@@ -1,5 +1,3 @@
-import { InlineNotification } from "@carbon/react";
-
 import {
   InformationFilled,
   ErrorFilled,

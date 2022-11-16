@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { fetcher } from 'lib/apiFetcher';
+import { fetcher } from 'lib/utils/apiFetcher';
 import InlineNoti from './InlineNoti';
+import { validateSecretInputs } from 'lib/utils/validation';
 import { 
   Tile,
   FormGroup,
@@ -27,29 +28,8 @@ const SecretInput = (props) => {
     }
   }
 
-  const validateSecretInputs = (payload) => {
-    let areAllInputsValid = true;
-    if (payload.secretLabel.length === 0) {
-      setInvalidSecretLabel(true);
-      areAllInputsValid = false;
-    }
-
-    if (payload.secret.length === 0) {
-      setInvalidSecret(true);
-      areAllInputsValid = false;
-    }
-
-    return areAllInputsValid;
-  }
-
-
-  const createSuccess = () => {
-    setCreateLoading(false);
-  }
-
 
   const createSecret = async (e) => {
-
     setInvalidSecretLabel(false);
     setInvalidSecret(false);
     setCreateLoading(true);
@@ -60,15 +40,23 @@ const SecretInput = (props) => {
       notes: notes.value.length > 0 ? notes.value : "null"
     };
 
-    if (!validateSecretInputs(payload)) {
+    const validateInputs = validateSecretInputs(payload);
+    if (!validateInputs.areAllInputsValid) {
+      setInvalidSecretLabel(validateInputs.invalidSecretLabel);
+      setInvalidSecret(validateInputs.invalidSecret);
       setCreateLoading(false);
       return;
     }
 
     const headers = { "Content-type": "application/json" };
     const createSecretResp = await fetcher("createSecret", "/api/secret/create", "POST", headers, JSON.stringify(payload));
-    setLoadingStatus(createSecretResp.status === "success" ? "finished" : "error"); 
+    setCreateLoading(false);
     setCreateResponse(createSecretResp);
+    if (createSecretResp.status === "success") {
+      label.value = "";
+      secret.value = "";
+      notes.value = "";
+    }
   }
 
 
@@ -115,9 +103,7 @@ const SecretInput = (props) => {
             ) : (
               <InlineLoading 
                 description="Encrypting secret..."
-                status={loadingStatus}
-                onSuccess={createSuccess}
-                successDelay={2000}
+                status="active"
               />
             )
           }
