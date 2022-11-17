@@ -1,14 +1,13 @@
 import { Tile } from "@carbon/react";
-import InlineNoti from "./InlineNoti";
 import { InformationFilled } from '@carbon/react/icons';
-
+import Link from "next/link";
 
 const SessionExpired = () => {
   return (
     <Tile className="regularLink">
       <div className="inlineNotiContainer">
         <InformationFilled size={20} className="infoIcon"/>
-        <div className="notiText">Session Expired... <a href="/login">Click here to login!</a></div>
+        <div className="notiText">Session Expired... <Link href="/login">Click here to login!</Link></div>
       </div>
     </Tile>
   );

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { fetcher } from 'lib/utils/apiFetcher';
 import InlineNoti from './InlineNoti';
 import { validateSecretInputs } from 'lib/utils/validation';
+import SessionExpired from './SessionExpired';
 import { 
   Tile,
   FormGroup,
@@ -18,7 +19,7 @@ const SecretInput = (props) => {
   const [createResponse, setCreateResponse] = useState(null);
   const [invalidSecretLabel, setInvalidSecretLabel] = useState(false);
   const [invalidSecret, setInvalidSecret] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState("active");
+  const [sessionExpired, setSessionExpired] = useState(false);
 
 
   const loginOnEnterKey = async (e) => {
@@ -50,67 +51,79 @@ const SecretInput = (props) => {
 
     const headers = { "Content-type": "application/json" };
     const createSecretResp = await fetcher("createSecret", "/api/secret/create", "POST", headers, JSON.stringify(payload));
-    setCreateLoading(false);
-    setCreateResponse(createSecretResp);
+    if (createSecretResp.status === "fail" && createSecretResp.message === "Unauthorized") {
+      setSessionExpired(true);
+    }
+
     if (createSecretResp.status === "success") {
       label.value = "";
       secret.value = "";
       notes.value = "";
     }
+
+    setCreateLoading(false);
+    setCreateResponse(createSecretResp);
   }
 
 
   return (
-    <Tile>
-      <FormGroup legendText="Create new secret">
-        <Stack gap={7}>
-          <TextInput 
-            id="label"
-            name="label"
-            type="text"
-            labelText="Enter Secret Label"
-            placeholder="bank account"
-            invalid={invalidSecretLabel}
-            invalidText="Value cannot be null"
-            onKeyPress={loginOnEnterKey}
-          />
-          <TextInput.PasswordInput 
-            id="secret"
-            name="secret"
-            type="password"
-            labelText="Enter Secret Password"
-            placeholder="p@ssw0rd"
-            invalid={invalidSecret}
-            invalidText="Value cannot be null"
-            onKeyPress={loginOnEnterKey}
-          />
-          <TextArea 
-            id="notes"
-            name="notes"
-            placeholder="Login at myBank.com"
-            labelText="Additional Notes (Optional)"
-            maxCount={100}
-            enableCounter={true}
-          />
-          {
-            !createLoading ? (
-              <Button 
-                id="submit"
-                onClick={createSecret}
-              >
-                Create Secret
-              </Button>
-            ) : (
-              <InlineLoading 
-                description="Encrypting secret..."
-                status="active"
-              />
-            )
-          }
-        </Stack>
-      </FormGroup>
-      { createResponse && <InlineNoti data={createResponse} /> }
-    </Tile>
+    <>
+      { sessionExpired ? ( 
+          <SessionExpired /> 
+        ) : (
+          <Tile>
+            <FormGroup legendText="Create new secret">
+              <Stack gap={7}>
+                <TextInput 
+                  id="label"
+                  name="label"
+                  type="text"
+                  labelText="Enter Secret Label"
+                  placeholder="bank account"
+                  invalid={invalidSecretLabel}
+                  invalidText="Value cannot be null"
+                  onKeyPress={loginOnEnterKey}
+                />
+                <TextInput.PasswordInput 
+                  id="secret"
+                  name="secret"
+                  type="password"
+                  labelText="Enter Secret Password"
+                  placeholder="p@ssw0rd"
+                  invalid={invalidSecret}
+                  invalidText="Value cannot be null"
+                  onKeyPress={loginOnEnterKey}
+                />
+                <TextArea 
+                  id="notes"
+                  name="notes"
+                  placeholder="Login at myBank.com"
+                  labelText="Additional Notes (Optional)"
+                  maxCount={100}
+                  enableCounter={true}
+                />
+                {
+                  !createLoading ? (
+                    <Button 
+                      id="submit"
+                      onClick={createSecret}
+                    >
+                      Create Secret
+                    </Button>
+                  ) : (
+                    <InlineLoading 
+                      description="Encrypting secret..."
+                      status="active"
+                    />
+                  )
+                }
+              </Stack>
+            </FormGroup>
+            { createResponse && <InlineNoti data={createResponse} /> }
+          </Tile>
+        )
+      }
+    </> 
   );
 
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactPortal from "./ReactPortal";
 import { fetcher } from "lib/utils/apiFetcher";
 import InlineNoti from "components/InlineNoti";
+import SessionExpired from "components/SessionExpired";
 import { 
   ComposedModal,
   ModalHeader,
@@ -19,7 +20,7 @@ const ViewSecretModal = (props) => {
   const [loading, setLoading] = useState(true);
   const [decrypted, setDecrypted] = useState("");
   const [error, setError] = useState(false);
-
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     const getSecret = async () => {
@@ -34,7 +35,11 @@ const ViewSecretModal = (props) => {
     const payload = { label: props.secretLabel };
     const decryptResp = await fetcher("decryptSecret", "/api/secret/decrypt", "POST", headers, JSON.stringify(payload));
     if (decryptResp.status !== "success") {
-      setError(true);
+      if (decryptResp.status === "fail" && decryptResp.message === "Unauthorized") {
+        setSessionExpired(true);
+      } else {
+        setError(true);
+      }
     }
     setDecrypted(decryptResp);
     setLoading(false);
@@ -54,34 +59,42 @@ const ViewSecretModal = (props) => {
           <p className="secretHeading">
             {props.secretLabel}
           </p>
-          { loading && (
-            <>
-              <TextInputSkeleton /> 
-              <TextAreaSkeleton className="topMargin"/>
-            </>
-          )}
-              
-          { !loading && decrypted && error && <InlineNoti data={decrypted} /> }
-              
-          { !loading && decrypted && !error && (
-            <>
-              <TextInput.PasswordInput
-                id="viewSecret"
-                name="viewSecret"
-                type="password"
-                labelText="Secret"
-                hideLabel
-                value={decrypted.data.secret}
-              />
-              <TextArea 
-                className="topMargin"
-                id="viewNotes"
-                name="viewNotes"
-                labelText="Additional Notes"
-                value={decrypted.data.notes}
-              />
-            </>
-          )}
+          { sessionExpired ? (
+              <SessionExpired />
+            ) : (
+              <>
+                { loading && (
+                  <>
+                    <TextInputSkeleton /> 
+                    <TextAreaSkeleton className="topMargin"/>
+                  </>
+                )}
+                    
+                { !loading && decrypted && error && <InlineNoti data={decrypted} /> }
+                    
+                { !loading && decrypted && !error && (
+                  <>
+                    <TextInput.PasswordInput
+                      id="viewSecret"
+                      name="viewSecret"
+                      type="password"
+                      labelText="Secret"
+                      hideLabel
+                      value={decrypted.data.secret}
+                    />
+                    <TextArea 
+                      className="topMargin"
+                      id="viewNotes"
+                      name="viewNotes"
+                      labelText="Additional Notes"
+                      value={decrypted.data.notes}
+                    />
+                  </>
+                )}
+              </>
+            )
+          }
+
         </ModalBody>
         <ModalFooter>
           <Button kind="primary" disabled={loading} onClick={() => props.handleModalClose()}>

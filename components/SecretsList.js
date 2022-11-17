@@ -49,7 +49,7 @@ const SecretsList = (props) => {
     setError(false);
 
     const secretListResp = await fetcher("getSecretList", "/api/secrets/list", "GET");
-    if (secretListResp.status === "fail") {
+    if (secretListResp.status === "fail" && secretListResp.message === "Unauthorized") {
       setSessionExpired(true);
     }
     
