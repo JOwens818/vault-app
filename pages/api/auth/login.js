@@ -14,7 +14,7 @@ const handler = async (req, res) => {
   
   const userLoginResp = await validateUserLogin(username, pw);
   if (userLoginResp.status !== "success") {
-    const status = userLoginResp.status === "error"? 500 : 401;
+    const status = userLoginResp.status === "error" ? 500 : 401;
     return res.status(status).json(userLoginResp);
   }
     

@@ -17,13 +17,14 @@ import {
   Theme
 } from "@carbon/react";
 
-const ViewSecretModal = (props) => {
+const UpdateSecretModal = (props) => {
 
   const { theme } = useThemePreference();
   const [loading, setLoading] = useState(true);
-  const [decrypted, setDecrypted] = useState("");
+  const [decrypted, setDecrypted] = useState(null);
   const [error, setError] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [update, setUpdate] = useState(null);
 
   useEffect(() => {
     const getSecret = async () => {
@@ -49,16 +50,36 @@ const ViewSecretModal = (props) => {
   }
 
 
+  const updateSecret = async () => {
+
+    const headers = { "Content-type": "application/json" };
+    const payload = {
+      password: password.value,
+      id: decrypted.data.id,
+      secretLabel: secretLabel.value,
+      secret: secret.value,
+      notes: notes.value.length > 0 ? notes.value : "null"
+    };
+    const updateResp = await fetcher("updateSecret", "/api/secret/update", "POST", headers, JSON.stringify(payload));
+    if (decryptResp.status !== "success") {
+      if (decryptResp.status === "fail" && decryptResp.message === "Unauthorized") {
+        setSessionExpired(true);
+      } else {
+        setError(true);
+      }
+    }
+  }
+
   return (
-    <ReactPortal wrapperId="view-secret">
+    <ReactPortal wrapperId="update-secret">
       <Theme theme={theme}>
         <ComposedModal
           size="sm"
-          open={props.isViewModalOpen}
+          open={props.isUpdateModalOpen}
           preventCloseOnClickOutside={true}
           onClose={() => props.handleModalClose()}>
 
-          <ModalHeader title="View Secret"/>
+          <ModalHeader title="Update Secret"/>
           <ModalBody>
             { sessionExpired ? (
                 <SessionExpired />
@@ -68,6 +89,7 @@ const ViewSecretModal = (props) => {
                     <>
                       <TextInputSkeleton /> 
                       <TextAreaSkeleton className="topMargin"/>
+                      <TextAreaSkeleton className="topMargin"/>
                     </>
                   )}
                       
@@ -75,20 +97,33 @@ const ViewSecretModal = (props) => {
                       
                   { !loading && decrypted && !error && (
                     <>
+                      <TextInput 
+                        className="bottomMarginPx"
+                        id="secretLabel"
+                        name="secretLabel"
+                        type="text"
+                        labelText="Secret Label"
+                        defaultValue={decrypted.data.label}
+                      />
                       <TextInput.PasswordInput
-                        id="viewSecret"
-                        name="viewSecret"
+                        id="secret"
+                        name="secret"
                         type="password"
-                        labelText={props.secretLabel}
-                        value={decrypted.data.secret}
-                        
+                        labelText="Secret Password"
+                        defaultValue={decrypted.data.secret}
                       />
                       <TextArea 
-                        className="topMargin"
-                        id="viewNotes"
-                        name="viewNotes"
+                        className="topMargin bottomMargin"
+                        id="notes"
+                        name="notes"
                         labelText="Additional Notes"
-                        value={decrypted.data.notes}
+                        defaultValue={decrypted.data.notes}
+                      />
+                      <TextInput.PasswordInput 
+                        id="password"
+                        name="password"
+                        type="password"
+                        labelText="Enter Your Password"
                       />
                     </>
                   )}
@@ -98,8 +133,9 @@ const ViewSecretModal = (props) => {
 
           </ModalBody>
           <ModalFooter>
+            <Button kind="secondary" onClick={() => props.handleModalClose()}>Cancel</Button>
             <Button kind="primary" disabled={loading} onClick={() => props.handleModalClose()}>
-              OK
+              Update Secret
             </Button>
             </ModalFooter>
         </ComposedModal>
@@ -108,4 +144,4 @@ const ViewSecretModal = (props) => {
   );
 };
 
-export default ViewSecretModal;
+export default UpdateSecretModal;

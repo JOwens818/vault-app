@@ -87,7 +87,7 @@ a {
 }
 
 .cds--modal-container {
-  max-height: 50% !important;
+  max-height: 75% !important;
 }
 
 .secretHeading {
@@ -126,4 +126,12 @@ a {
 
 .topMargin {
   margin-top: 1rem;
+}
+
+.bottomMarginPx {
+  margin-bottom: 7px;
+}
+
+.bottomMargin {
+  margin-bottom: 1rem;
 }

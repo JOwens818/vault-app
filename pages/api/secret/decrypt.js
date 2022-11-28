@@ -8,6 +8,7 @@ const handler = async (req, res) => {
 
   let decryptedSecret;
   let decryptedNotes;
+  let decryptedLabel;
   const hashedLabel = generateHash(req.body.label);
 
   const userResp = await doesUserExist(req.username);
@@ -22,11 +23,13 @@ const handler = async (req, res) => {
   }
 
   try {
+    const label = secretResp.data[0][process.env.SECRET_TBL_COL_ENCRYPTEDLBL];
     const secret = secretResp.data[0][process.env.SECRET_TBL_COL_ENCRYPTEDPW];
     const notes = secretResp.data[0][process.env.SECRET_TBL_COL_NOTES];
     const iv = secretResp.data[0][process.env.SECRET_TBL_COL_IV];
     decryptedSecret = decrypt(secret, iv);
     decryptedNotes = decrypt(notes, iv);
+    decryptedLabel = decrypt(label, iv);
     if (decryptedNotes === "null") {
       decryptedNotes = "";
     }
@@ -39,6 +42,8 @@ const handler = async (req, res) => {
     { 
       status: "success", 
       data: { 
+        id: secretResp.data[0].id,
+        label: decryptedLabel,
         secret: decryptedSecret,
         notes: decryptedNotes
       } 

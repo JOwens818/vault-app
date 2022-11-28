@@ -92,6 +92,17 @@ const LoginPage = () => {
     }
   }
 
+  
+  const newUserToggle = () => {
+    
+    setInvalidUsername(false);
+    setInvalidPassword(false);
+    setInvalidEmail(false);
+    username.value = "";
+    password.value = "";
+    setNewUser(!newUser);
+  }
+
 
   if (authLoading) return <Loading />;
 
@@ -112,7 +123,7 @@ const LoginPage = () => {
                     id="newuser"
                     labelText="I'm a new user"
                     checked={newUser}
-                    onChange={() => setNewUser(!newUser)}
+                    onChange={newUserToggle}
                   />
                   <TextInput 
                     id="username"

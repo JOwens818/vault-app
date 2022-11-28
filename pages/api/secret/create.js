@@ -31,7 +31,14 @@ const handler = async (req, res) => {
     }
 
     // Encrypt and save
-    const encryptedValues = encryptSecretValues(secret, label, notes, iv);
+    let encryptedValues;
+    try {
+      encryptedValues = encryptSecretValues(secret, label, notes, iv);
+    } catch (encryptErr) { 
+      console.error("Error encrypting values: " + encryptErr);
+      return res.status(500).json({ status: "error", message: "Error creating secret" });
+    }
+    
     const createSecret = await createUserSecret(
       userid, 
       hashedLabel, 

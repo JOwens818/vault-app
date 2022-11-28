@@ -3,6 +3,7 @@ import { fetcher } from 'lib/utils/apiFetcher';
 import { useRouter } from "next/router";
 import SessionExpired from './SessionExpired';
 import ViewSecretModal from './modals/ViewSecret';
+import UpdateSecretModal from './modals/UpdateSecret';
 import InlineNoti from './InlineNoti';
 import { 
   Button,
@@ -32,6 +33,7 @@ const SecretsList = (props) => {
   const [secretListResponse, setSecretListResponse] = useState(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [secretLabel, setSecretLabel] = useState("");
   const [noSelection, setNoSelection] = useState(false);
 
@@ -61,11 +63,18 @@ const SecretsList = (props) => {
   }
 
   
-  const getSecret = async (selectedRow) => {
+  const getSecret = async (selectedRow, type) => {
     if (selectedRow.length > 0) {
       setNoSelection(false);
       setSecretLabel(getLabel(selectedRow));
-      setIsViewModalOpen(true);
+      if (type === "view") {
+        setIsViewModalOpen(true);
+      } else if (type === "update") {
+        setIsUpdateModalOpen(true);
+      } else {
+        console.log('delete');
+      }
+      
     } else {
       setNoSelection(true);
     }
@@ -90,6 +99,12 @@ const SecretsList = (props) => {
 
   const handleModalClose = () => {
     setIsViewModalOpen(false);
+    setIsUpdateModalOpen(false);
+  }
+
+  const handleModalCloseRefresh = async () => {
+    setIsUpdateModalOpen(false);
+    await getSecretList();
   }
   
 
@@ -102,6 +117,16 @@ const SecretsList = (props) => {
           isViewModalOpen={isViewModalOpen}
           handleModalClose={handleModalClose}
           secretLabel={secretLabel}
+          />
+        )
+      }
+
+      {
+        isUpdateModalOpen && (
+          <UpdateSecretModal 
+            isUpdateModalOpen = {isUpdateModalOpen}
+            handleModalClose={handleModalClose}
+            secretLabel={secretLabel}
           />
         )
       }
@@ -167,13 +192,13 @@ const SecretsList = (props) => {
                             iconDescription="Delete"
                             renderIcon={TrashCan} />
                           <Button
-                            onClick={() => console.log(getLabel(selectedRows))}
+                            onClick={() => getSecret(selectedRows, "update")}
                             kind="ghost"
                             hasIconOnly
                             iconDescription="Update"
                             renderIcon={UpdateNow} />
                           <Button
-                            onClick={() => getSecret(selectedRows)}
+                            onClick={() => getSecret(selectedRows, "view")}
                             kind="ghost"
                             hasIconOnly
                             iconDescription="View"
