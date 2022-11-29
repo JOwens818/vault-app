@@ -20,6 +20,7 @@ const SecretInput = (props) => {
   const [invalidSecretLabel, setInvalidSecretLabel] = useState(false);
   const [invalidSecret, setInvalidSecret] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [showCreateResult, setShowCreateResult] = useState(false);
 
 
   const loginOnEnterKey = async (e) => {
@@ -34,6 +35,7 @@ const SecretInput = (props) => {
     setInvalidSecretLabel(false);
     setInvalidSecret(false);
     setCreateLoading(true);
+    setShowCreateResult(false);
     
     const payload = {
       secretLabel: label.value,
@@ -63,6 +65,7 @@ const SecretInput = (props) => {
 
     setCreateLoading(false);
     setCreateResponse(createSecretResp);
+    setShowCreateResult(true);
   }
 
 
@@ -119,7 +122,7 @@ const SecretInput = (props) => {
                 }
               </Stack>
             </FormGroup>
-            { createResponse && <InlineNoti data={createResponse} /> }
+            { showCreateResult && <InlineNoti data={createResponse} /> }
           </Tile>
         )
       }

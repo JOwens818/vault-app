@@ -23,8 +23,8 @@ const handler = async (req, res) => {
     }
 
     // Encrypt and save
+    let encryptedValues;
     try {
-      let encryptedValues;
       encryptedValues = encryptSecretValues(secret, label, notes, iv);
     } catch (encryptErr) { 
       console.error("Error encrypting values: " + encryptErr);

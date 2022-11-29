@@ -56,7 +56,7 @@ const ViewSecretModal = (props) => {
           size="sm"
           open={props.isViewModalOpen}
           preventCloseOnClickOutside={true}
-          onClose={() => props.handleModalClose()}>
+          onClose={() => props.handleModalClose(false)}>
 
           <ModalHeader title="View Secret"/>
           <ModalBody>
@@ -98,7 +98,7 @@ const ViewSecretModal = (props) => {
 
           </ModalBody>
           <ModalFooter>
-            <Button kind="primary" disabled={loading} onClick={() => props.handleModalClose()}>
+            <Button kind="primary" disabled={loading} onClick={() => props.handleModalClose(false)}>
               OK
             </Button>
             </ModalFooter>

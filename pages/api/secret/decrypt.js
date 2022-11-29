@@ -11,17 +11,20 @@ const handler = async (req, res) => {
   let decryptedLabel;
   const hashedLabel = generateHash(req.body.label);
 
+  // Find User
   const userResp = await doesUserExist(req.username);
   if (userResp.status !== "success") {
     return res.status(200).json(userResp);
   }
 
+  // Check if secret exists
   const userid = userResp.data[0].id;
   const secretResp = await doesUserSecretExist(userid, hashedLabel);
   if (secretResp.status !== "success") {
     return res.status(200).json(secretResp);
   }
 
+  // Decrypt
   try {
     const label = secretResp.data[0][process.env.SECRET_TBL_COL_ENCRYPTEDLBL];
     const secret = secretResp.data[0][process.env.SECRET_TBL_COL_ENCRYPTEDPW];
