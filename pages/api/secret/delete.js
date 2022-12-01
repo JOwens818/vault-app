@@ -1,7 +1,7 @@
 import validateToken from "lib/auth/validateToken";
 import { validateUserLogin } from "lib/db/users";
-import { generateHash, generateIv } from "lib/crypto/encrypt-decrypt";
-import { doesUserSecretExist } from "lib/db/secrets";
+import { generateHash } from "lib/crypto/encrypt-decrypt";
+import { doesUserSecretExist, deleteUserSecret } from "lib/db/secrets";
 
 const handler = async (req, res) => {
 
@@ -28,6 +28,14 @@ const handler = async (req, res) => {
     }
 
     // Delete Secret
+    const secretId = findSecret.data[0].id;
+    const deleteSecret = await deleteUserSecret(secretId);
+
+    if (deleteSecret.status === "error") {
+      return res.status(500).json({ status: "error", message: "Error deleting secret" });
+    }
+
+    res.status(200).json({ status: "success", message: "Secret deleted successfully" });
 
 
   } else {

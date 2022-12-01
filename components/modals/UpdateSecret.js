@@ -108,6 +108,14 @@ const UpdateSecretModal = (props) => {
   }
 
 
+  const updateOnEnterKey = async (e) => {
+    const code = e.keyCode || e.which;
+    if (code ===13) {
+      updateSecret();
+    }
+  }
+
+
   return (
     <ReactPortal wrapperId="update-secret">
       <Theme theme={theme}>
@@ -144,6 +152,7 @@ const UpdateSecretModal = (props) => {
                         invalid={invalidSecretLabel}
                         invalidText="Value cannot be null"
                         defaultValue={decrypted.data.label}
+                        onKeyPress={updateOnEnterKey}
                       />
                       <TextInput.PasswordInput
                         id="secret"
@@ -153,6 +162,7 @@ const UpdateSecretModal = (props) => {
                         invalid={invalidSecret}
                         invalidText="Value cannot be null"
                         defaultValue={decrypted.data.secret}
+                        onKeyPress={updateOnEnterKey}
                       />
                       <TextArea 
                         className="topMargin bottomMargin"
@@ -162,6 +172,7 @@ const UpdateSecretModal = (props) => {
                         maxCount={100}
                         enableCounter={true}
                         defaultValue={decrypted.data.notes}
+                        onKeyPress={updateOnEnterKey}
                       />
                       <TextInput.PasswordInput 
                         id="password"
@@ -170,6 +181,7 @@ const UpdateSecretModal = (props) => {
                         labelText="Enter Your Login Password To Update"
                         invalid={invalidPassword}
                         invalidText="Invalid Password"
+                        onKeyPress={updateOnEnterKey}
                       />
                       { showUpdatedResult && <InlineNoti data={updateResp} /> }
                     </>

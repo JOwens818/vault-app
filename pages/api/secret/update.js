@@ -1,7 +1,7 @@
 import validateToken from "lib/auth/validateToken";
 import { validateUserLogin } from "lib/db/users";
-import { generateHash, generateIv } from "lib/crypto/encrypt-decrypt";
-import { encryptSecretValues, updateUserSecret } from "lib/db/secrets";
+import { generateHash, generateIv, encryptSecretValues } from "lib/crypto/encrypt-decrypt";
+import { updateUserSecret } from "lib/db/secrets";
 
 const handler = async (req, res) => {
 
@@ -31,7 +31,7 @@ const handler = async (req, res) => {
       return res.status(500).json({ status: "error", message: "Error updating secret" });
     }
 
-    const updateSecret = updateUserSecret(
+    const updateSecret = await updateUserSecret(
       secretId, 
       hashedLabel, 
       encryptedValues.encryptedLabel,

@@ -1,6 +1,6 @@
 import validateToken from "lib/auth/validateToken";
-import { generateHash, generateIv } from "lib/crypto/encrypt-decrypt";
-import { doesUserSecretExist, createUserSecret, encryptSecretValues } from "lib/db/secrets";
+import { generateHash, generateIv, encryptSecretValues } from "lib/crypto/encrypt-decrypt";
+import { doesUserSecretExist, createUserSecret } from "lib/db/secrets";
 import { doesUserExist } from "lib/db/users";
 
 const handler = async (req, res) => {

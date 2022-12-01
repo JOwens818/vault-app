@@ -87,8 +87,9 @@ a {
 }
 
 .cds--modal-container {
-  max-height: 75% !important;
+  max-height: 90% !important;
 }
+
 
 .secretHeading {
   @include type.type-style("fluid-heading-03", true);

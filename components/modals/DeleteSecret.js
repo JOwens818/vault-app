@@ -20,8 +20,9 @@ const DeleteSecretModal = (props) => {
   const { theme } = useThemePreference();
   const [sessionExpired, setSessionExpired] = useState(false);
   const [deleteRequested, setDeleteRequested] = useState(false);
-  const [error, setError] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState("active");
+  const [deleteDesc, setDeleteDesc] = useState("Deleting Secret...");
+  const [invalidPassword, setInvalidPassword] = useState(false);
 
 
   const closeModal = () => {
@@ -32,9 +33,36 @@ const DeleteSecretModal = (props) => {
     }
   }
 
+  const deleteOnEnterKey = async (e) => {
+    const code = e.keyCode || e.which;
+    if (code ===13) {
+      deleteSecret();
+    }
+  }
 
-  const deleteSecret = () => {
-    closeModal();
+
+  const deleteSecret = async () => {
+    setDeleteRequested(true);
+    setInvalidPassword(false);
+    const headers = { "Content-type": "application/json" };
+    const payload = {
+      password: password.value,
+      secretLabel: props.secretLabel
+    };
+
+    const deleteResp = await fetcher("deleteSecret", "/api/secret/delete", "POST", headers, JSON.stringify(payload));
+    if (deleteResp.status === "fail" && deleteResp.message === "Unauthorized") {
+      setSessionExpired(true);
+    }
+
+    if (deleteResp.status === "error" && deleteResp.message === "Invalid password") {
+      setInvalidPassword(true);
+      setDeleteRequested(false);
+      return;
+    }
+
+    setDeleteStatus(deleteResp.status === "error" ? "error" : "finished");
+    setDeleteDesc(deleteResp.status === "error" ? "Error Occurred" : "Secret Deleted");
   }
 
 
@@ -53,12 +81,17 @@ const DeleteSecretModal = (props) => {
                 <SessionExpired />
               ) : (
                 <>
-                  <p className="bottomMargin">The secret <em className="boldFont">{props.secretLabel}</em> will be permanantly deleted.  Do you want to proceed?</p>
+                  <p className="bottomMargin">
+                    The secret <em className="boldFont">{props.secretLabel}</em> will be permanantly deleted.  Do you want to proceed?
+                  </p>
                   <TextInput.PasswordInput 
                     id="password"
                     name="password"
                     type="password"
                     labelText="Enter Your Login Password To Delete"
+                    invalid={invalidPassword}
+                    invalidText="Invalid Password"
+                    onKeyPress={deleteOnEnterKey}
                   />
                 </>
               )
@@ -71,7 +104,7 @@ const DeleteSecretModal = (props) => {
             { deleteRequested ? (
                 <InlineLoading 
                   className="modalInlineLoading"
-                  description="Deleting Secret..."
+                  description={deleteDesc}
                   status={deleteStatus}
                 />
               ) : (
