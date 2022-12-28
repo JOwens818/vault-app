@@ -18,7 +18,7 @@ const handler = async (req, res) => {
   const userResp = await doesUserExist(username);
 
   // Error occurred getting user from DB
-  if (userResp.status === "error") {
+  if (userResp.status === "error" && userResp.message !== "This username does not exist") {
     return res.status(500).json(userResp);
   }
 

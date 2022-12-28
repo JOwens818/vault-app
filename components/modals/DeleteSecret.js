@@ -53,6 +53,7 @@ const DeleteSecretModal = (props) => {
     const deleteResp = await fetcher("deleteSecret", "/api/secret/delete", "POST", headers, JSON.stringify(payload));
     if (deleteResp.status === "fail" && deleteResp.message === "Unauthorized") {
       setSessionExpired(true);
+      setDeleteRequested(false);
     }
 
     if (deleteResp.status === "error" && deleteResp.message === "Invalid password") {
@@ -108,7 +109,10 @@ const DeleteSecretModal = (props) => {
                   status={deleteStatus}
                 />
               ) : (
-                <Button kind="danger" onClick={() => deleteSecret()}>
+                <Button 
+                  kind="danger" 
+                  onClick={() => deleteSecret()}
+                  disabled={sessionExpired}>
                   Delete Secret
                 </Button>
               )

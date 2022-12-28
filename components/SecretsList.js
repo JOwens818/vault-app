@@ -158,7 +158,7 @@ const SecretsList = (props) => {
           
             { !error && secretListResponse.data && secretListResponse.data.length === 0 && ( 
               <Tile>
-                <InlineNoti data = {{ status: "fail", message: "No secrets found" }}/>
+                <InlineNoti data = {{ status: "fail", message: "No secrets found.  Go to the 'Create Secret' tab to start" }}/>
               </Tile> 
             )}
 

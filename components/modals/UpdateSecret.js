@@ -200,7 +200,7 @@ const UpdateSecretModal = (props) => {
                   status="active"
                 />
               ) : (
-                <Button kind="primary" disabled={loading} onClick={() => updateSecret()}>
+                <Button kind="primary" disabled={loading || sessionExpired} onClick={() => updateSecret()}>
                   Update Secret
                 </Button>
               )
