@@ -146,3 +146,15 @@ a {
   font-weight: bold;
   color: react.$support-error;
 }
+
+.cds--tile--selectable {
+  background-color: react.$background-selected;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.cds--tile--selectable svg {
+  margin-right: 1rem;
+  height: 1rem;
+  width: 1rem;
+}
