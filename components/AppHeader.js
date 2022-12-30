@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -24,6 +24,7 @@ import {
   UserAvatar
 } from '@carbon/react/icons';
 
+import LogoutModal from './modals/Logout';
 import ChangeTheme from './modals/ChangeTheme';
 import { useThemePreference } from './ThemePreference'
 
@@ -33,9 +34,21 @@ const AppHeader = () => {
   const { theme } = useThemePreference();
   const [seeProfileMenu, setSeeProfileMenu] = useState(false);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const handleModalClose = async (refreshList) => {
+
+  useEffect(() => {
+    setSeeProfileMenu(false);
+  }, [router.pathname]);
+
+
+  const handleModalClose = (modalType) => {
     setIsThemeModalOpen(false);
+    setIsLogoutModalOpen(false);
+    setSeeProfileMenu(false);
+    if (modalType === "logout") {
+      router.push("/login");
+    }
   }
 
   return (
@@ -44,6 +57,15 @@ const AppHeader = () => {
         isThemeModalOpen && (
           <ChangeTheme 
           isThemeModalOpen={isThemeModalOpen}
+          handleModalClose={handleModalClose}
+          />
+        )
+      }
+
+      {
+        isLogoutModalOpen && (
+          <LogoutModal 
+          isLogoutModalOpen={isLogoutModalOpen}
           handleModalClose={handleModalClose}
           />
         )
@@ -71,8 +93,7 @@ const AppHeader = () => {
                   aria-label="Profile"
                   hideLabel
                   tooltipAlignment="end"
-                  onClick={() => setSeeProfileMenu(!seeProfileMenu)}
-                  onfocusout={() => setSeeProfileMenu(false)}>
+                  onClick={() => setSeeProfileMenu(!seeProfileMenu)}>
                   <UserAvatar size={32} />
                 </HeaderGlobalAction>
               </HeaderGlobalBar>
@@ -83,7 +104,7 @@ const AppHeader = () => {
                     router.pathname != "/login" &&
                     <>
                       <SwitcherDivider />
-                      <SwitcherItem>Logout</SwitcherItem>
+                      <SwitcherItem onClick={() => setIsLogoutModalOpen(true)}>Log out</SwitcherItem>
                     </>  
                   }
                 </Switcher>

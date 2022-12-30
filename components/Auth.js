@@ -37,7 +37,9 @@ const userProvideAuth = () => {
           }
         } else {
           setUsername(validationResp.data.username);
-          if (validationResp.data.username !== "admin" && router.pathname === "/admin") {
+          if ((validationResp.data.username !== "admin" && router.pathname === "/admin") || 
+              router.pathname === "/login" 
+          ) {
             router.push("/");
           }
           if (validationResp.data.username === "admin" && router.pathname !== "/admin") {

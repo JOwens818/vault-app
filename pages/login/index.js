@@ -60,7 +60,7 @@ const LoginPage = () => {
     }
 
     const inputValidation = validateNewUserInputs(payload);
-    if (username.value !== "admin" && newUser && !inputValidation.areAllInputsValid) { 
+    if (newUser && !inputValidation.areAllInputsValid) { 
       setInvalidUsername(inputValidation.invalidUsername);
       setInvalidPassword(inputValidation.invalidPassword);
       setInvalidEmail(inputValidation.invalidEmail);
@@ -94,13 +94,13 @@ const LoginPage = () => {
 
   
   const newUserToggle = () => {
-    
     setInvalidUsername(false);
     setInvalidPassword(false);
     setInvalidEmail(false);
     username.value = "";
     password.value = "";
     setNewUser(!newUser);
+    setShowNoti(false);
   }
 
 

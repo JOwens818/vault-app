@@ -21,14 +21,14 @@ import {
 const ChangeTheme = (props) => {
 
   const { theme, setTheme } = useThemePreference();
-  const [defaultSelected, setDefaultSelected] = useState(theme === "g10" ? "light" : "dark")
-
 
   const optionSelected = (option) => {
     if (option === "light") {
       setTheme('g10');
+      localStorage.setItem("theme", "g10");
     } else {
       setTheme('g100');
+      localStorage.setItem("theme", "g100");
     }
   }
 
@@ -39,12 +39,12 @@ const ChangeTheme = (props) => {
           size="sm"
           open={props.isThemeModalOpen}
           preventCloseOnClickOutside={true}
-          onClose={() => props.handleModalClose()}>
+          onClose={() => props.handleModalClose("theme")}>
 
           <ModalHeader title="Change Theme"/>
           <ModalBody>
             <TileGroup
-              defaultSelected={defaultSelected}
+              defaultSelected={theme === "g10" ? "light" : "dark"}
               legend="Themes"
               name="themeGroup"
               onChange={optionSelected}>
@@ -66,7 +66,7 @@ const ChangeTheme = (props) => {
           <ModalFooter>
             <Button 
             kind="primary"
-            onClick={() => props.handleModalClose()}>
+            onClick={() => props.handleModalClose("theme")}>
               OK
             </Button>
           </ModalFooter>

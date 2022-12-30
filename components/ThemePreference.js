@@ -8,8 +8,20 @@ const useThemePreference = () => {
 }
 
 const ThemePreference = ({children}) => {
-  const [theme, setTheme] = useState('g100');
+  const [theme, setTheme] = useState("g100");
   const value = { theme, setTheme };
+
+  useEffect(() => {
+    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const defaultTheme = prefersDarkMode ? "g100" : "g10";
+    const preferredTheme = localStorage.getItem("theme");
+    if (!preferredTheme) {
+      localStorage.setItem("theme", defaultTheme);
+      setTheme(defaultTheme);
+    } else {
+      setTheme(preferredTheme);
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-carbon-theme', theme);
