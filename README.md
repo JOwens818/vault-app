@@ -48,6 +48,7 @@ Docker Container
 docker image build -t vault-app .
 docker run -p 3030:3030 vault-app
 ```
+*If docker and postgres are running on the same host add `--network="host"` to the docker run command*
 
 ### Table Initialization
 
