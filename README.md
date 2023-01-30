@@ -46,9 +46,23 @@ Docker Container
 
 ```sh
 docker image build -t vault-app .
-docker run -p 3030:3030 vault-app
+docker run -p 3030:3030 --env-file=/path/to/env_file vault-app
 ```
 *If docker and postgres are running on the same host add `--network="host"` to the docker run command*
+
+## Running the Application with NGINX reverse proxy & SSL
+
+ - Generate certificate files & replace in docker-compose.yml
+ - Replace path to env file in docker-compose.yml
+ - Replace server name in nginx.conf
+ - The application itself is set to connect with a local installation of postgres.  If you are connecting to a cloud instance alter do the following:
+   - Remove 'extra hosts' from NGINX service in in docker-compose.yml
+   - Remove 'network_mode' from vault-app service in dockery-compose.yml
+   - In nginx.conf -> upstream - comment out line that uses host.docker.internal and uncomment the line below
+
+```sh
+docker-compose up
+```
 
 ### Table Initialization
 
