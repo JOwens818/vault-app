@@ -21,3 +21,4 @@ services:
       - 3030
     env_file:
       - /home/pi/apps/envs/vault_envs
+    network_mode: "host"
