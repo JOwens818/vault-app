@@ -12,6 +12,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /ssl/rpi4apps.local.pem:/etc/ssl/certs/rpi4apps.local.pem
       - /ssl/rpi4apps.local-key.pem:/etc/ssl/certs/rpi4apps.local-key.pem
+    network_mode: bridge
 
   vault-app:
     container_name: vault-app
@@ -21,4 +22,4 @@ services:
       - 3030
     env_file:
       - /home/pi/apps/envs/vault_envs
-    network_mode: "host"
+    network_mode: host
