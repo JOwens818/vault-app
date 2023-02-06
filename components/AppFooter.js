@@ -10,7 +10,7 @@ const AppFooter = () => {
     <Theme theme={theme}>
       <Row className="footerContainer">
         <Column>
-          Footer Content Here
+          Copyright &copy; 2023
         </Column>
       </Row>
     </Theme>

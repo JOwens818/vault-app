@@ -81,13 +81,13 @@ const AppHeader = () => {
                 isActive={isSideNavExpanded}
               />
               <HeaderName prefix="">
-                <Link href="/">My App Name</Link>
+                <Link href="/"> Password Vault</Link>
               </HeaderName>
-              <HeaderNavigation aria-label="Header Nav">
+{/*               <HeaderNavigation aria-label="Header Nav">
                 <HeaderMenuItem>
                   <Link href="#">Awesome Page</Link>
                 </HeaderMenuItem>
-              </HeaderNavigation>
+              </HeaderNavigation> */}
               <HeaderGlobalBar>
                 <HeaderGlobalAction
                   aria-label="Profile"
@@ -109,7 +109,7 @@ const AppHeader = () => {
                   }
                 </Switcher>
               </HeaderPanel>
-              <SideNav
+{/*               <SideNav
                 aria-label="Side navigation"
                 expanded={isSideNavExpanded}
                 isPersistent={false}
@@ -121,7 +121,7 @@ const AppHeader = () => {
                     </HeaderMenuItem>
                   </HeaderSideNavItems>
                 </SideNavItems>
-              </SideNav>
+              </SideNav> */}
             </Header>
           )}
         />
